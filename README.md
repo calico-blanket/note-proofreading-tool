@@ -1,117 +1,132 @@
-# 🏠 家事ダッシュボード
+# note 校正支援ツール
 
-家事を点数化してモチベーションアップ！家族みんなで家事を楽しく競争できるWebアプリケーションです。
+team_mirai_log の note.com 過去記事から表記パターンを全文検索し、校正メモを管理できるWebアプリです。
 
-## ✨ 特徴
+---
 
-### 📱 モバイル対応
-- レスポンシブデザインでスマートフォンからも快適に利用可能
-- タッチ操作に最適化されたUI
-- PWA対応でホーム画面に追加可能
+## セットアップ手順
 
-### 👥 複数ユーザー対応
-- 家族全員での利用が可能
-- 個別ポイント管理とランキング表示
-- 競争機能でモチベーション向上
+### 1. リポジトリのクローン
 
-### ⚡ 主な機能
+```bash
+git clone https://github.com/<your-username>/note-proofreading-tool.git
+cd note-proofreading-tool
+```
 
-#### 🏆 ダッシュボード
-- 個人統計（今日・総ポイント、完了家事数、順位）
-- リーダーボード（月間ランキング）
-- 最近の家事記録一覧
+### 2. 依存パッケージのインストール
 
-#### 📝 家事記録
-- 簡単な操作で家事を記録
-- 時間別ポイント計算（10分、30分単位）
-- リアルタイムポイントプレビュー
+**Node.js（Next.js アプリ）:**
 
-#### ⚙️ 家事管理
-- デフォルト9種類の家事項目
-- カスタム家事項目の追加・削除
-- 難易度に応じた点数設定
+```bash
+npm install
+```
 
-## 🎯 デフォルト家事項目
+**Python（スクレイパー）:**
 
-| 家事項目 | 基本点数（10分あたり） | 難易度 |
-|---------|---------------------|--------|
-| 調理 | 3pt | 中 |
-| 皿洗い | 2pt | 低 |
-| 洗濯 | 1pt | 低 |
-| 洗濯干し | 2pt | 低 |
-| 衣類たたみ | 2pt | 低 |
-| アイロン | 4pt | 高 |
-| 風呂掃除 | 5pt | 高 |
-| ゴミ出し | 1pt | 低 |
-| 部屋掃除 | 3pt | 中 |
+```bash
+pip install -r scraper/requirements.txt
+```
 
-## 🚀 使い方
+### 3. Firebase プロジェクトの作成
 
-### 1. 初回セットアップ
-1. `household_dashboard.html` をブラウザで開く
-2. 「新しいユーザー名を入力」に名前を入力
-3. 「ユーザー追加」ボタンをクリック
+1. [Firebase コンソール](https://console.firebase.google.com) でプロジェクトを作成
+2. Firestore Database を有効化（本番モード）
+3. 「プロジェクトの設定」→「サービスアカウント」→「新しい秘密鍵の生成」でJSONをダウンロード
+4. ダウンロードしたJSONを `scraper/serviceAccountKey.json` として保存
 
-### 2. 家事の記録
-1. ユーザーを選択
-2. 「📝 家事記録」タブを開く
-3. 家事の種類と実行時間を選択
-4. 「家事を記録する」ボタンをクリック
+### 4. 環境変数の設定
 
-### 3. ランキングの確認
-1. 「📊 ダッシュボード」タブで統計を確認
-2. リーダーボードで家族内の順位をチェック
-3. モチベーション向上！
+**スクレイパー用（`scraper/.env`）:**
 
-## 💻 技術仕様
+```env
+FIREBASE_SERVICE_ACCOUNT_KEY_PATH=./serviceAccountKey.json
+NOTE_CREATOR_ID=team_mirai_log
+REQUEST_INTERVAL_SECONDS=1.5
+```
 
-- **フロントエンド**: HTML5, CSS3, JavaScript (Vanilla)
-- **データ保存**: LocalStorage (ブラウザローカル)
-- **対応ブラウザ**: Chrome, Firefox, Safari, Edge
-- **レスポンシブ**: モバイル・タブレット・デスクトップ対応
+**Next.js アプリ用（`.env.local`）:**
 
-## 📦 インストール方法
+`serviceAccountKey.json` の内容をBase64エンコードして設定します。
 
-### 方法1: 直接ダウンロード
-1. `household_dashboard.html` をダウンロード
-2. ブラウザで開く
-3. すぐに利用開始
+```bash
+# Mac / Linux
+base64 -i scraper/serviceAccountKey.json | tr -d '\n'
 
-### 方法2: GitHub Pages（推奨）
-1. このリポジトリをクローン
-2. GitHub Pagesで公開
-3. スマートフォンからもアクセス可能
+# Windows (PowerShell)
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("scraper\serviceAccountKey.json"))
+```
 
-## 🔧 カスタマイズ
+出力された文字列を `.env.local` に記載します：
 
-### 家事項目の追加
-1. 「⚙️ 家事管理」タブを開く
-2. 家事名と基本点数（1-10pt）を入力
-3. 「家事項目を追加」をクリック
+```env
+FIREBASE_SERVICE_ACCOUNT_KEY=<上記のBase64文字列>
+```
 
-### ポイント計算ルール
-- 基本点数 × 時間単位（10分単位）
-- 例: 調理30分 = 3pt × 3単位 = 9pt
+---
 
-## 📱 スマートフォン対応
+## 初回データ取得
 
-### ホーム画面への追加
-1. ブラウザでアプリを開く
-2. ブラウザメニューから「ホーム画面に追加」
-3. アプリアイコンが作成される
+```bash
+cd scraper
+python fetch_articles.py
+```
 
-### オフライン利用
-- データはブラウザに保存されるためオフラインでも利用可能
-- 家族間でデータ共有するには同一デバイス・ブラウザを使用
+team_mirai_log の記事を Firestore に保存します（初回は全件、2回目以降は差分のみ）。
 
-## 🤝 貢献
+---
 
-プルリクエストやイシューの報告を歓迎します！
+## ローカル開発
 
-## 📄 ライセンス
+```bash
+npm run dev
+```
 
-MIT License - 自由にご利用ください。
+ブラウザで [http://localhost:3000](http://localhost:3000) を開きます。
 
-## 🎉 楽しい家事ライフを！
+---
 
-家事をゲーム感覚で楽しみ、家族全員でモチベーションを高めましょう！
+## Vercel へのデプロイ
+
+1. [Vercel](https://vercel.com) にログイン
+2. 「Add New Project」→ GitHubリポジトリを選択してインポート
+3. 「Environment Variables」に以下を登録：
+   - `FIREBASE_SERVICE_ACCOUNT_KEY`（Base64エンコード済みのサービスアカウントJSON）
+4. 「Deploy」をクリック
+
+`main` ブランチへの push で自動的に再デプロイされます。
+
+### FIREBASE_SERVICE_ACCOUNT_KEY の Base64 エンコード方法
+
+**Mac / Linux:**
+```bash
+base64 -i serviceAccountKey.json | tr -d '\n'
+```
+
+**Windows (PowerShell):**
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("serviceAccountKey.json"))
+```
+
+---
+
+## GitHub Secrets の設定
+
+GitHub Actions による毎日の自動記事取得を有効にするために設定します。
+
+1. GitHubリポジトリの「Settings」→「Secrets and variables」→「Actions」を開く
+2. 「New repository secret」をクリック
+3. 以下を登録：
+   - **Name:** `FIREBASE_SERVICE_ACCOUNT_KEY`
+   - **Secret:** サービスアカウントJSONをBase64エンコードした値
+4. 「Actions」タブで「Update Articles from note.com」を選択
+5. 「Run workflow」で手動実行して動作確認
+
+---
+
+## 自動更新の仕組み
+
+`.github/workflows/update_articles.yml` により、毎日 JST 6:00（UTC 21:00）に自動でスクレイパーが実行されます。
+
+- 新規記事のみ差分取得して Firestore に保存
+- `workflow_dispatch` による手動実行にも対応
+- 実行ログは GitHub の「Actions」タブで確認できます

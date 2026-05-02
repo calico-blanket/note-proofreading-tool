@@ -1,0 +1,28 @@
+name: Update Articles from note.com
+
+on:
+  schedule:
+    # JST 6:00 = UTC 21:00（前日）
+    - cron: '0 21 * * *'
+  workflow_dispatch:  # 手動実行も可能にする
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Run scraper
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: python scraper/fetch_articles.py

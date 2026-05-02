@@ -1,0 +1,55 @@
+# 依存パッケージ
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/versions
+
+# テスト
+/coverage
+
+# Next.js ビルド成果物
+/.next/
+/out/
+
+# 本番ビルド
+/build
+
+# その他
+.DS_Store
+Thumbs.db
+*.pem
+
+# Python
+scraper/__pycache__/
+scraper/.env
+*.pyc
+
+# デバッグ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 環境変数（機密情報を含むため必ずgit管理外にする）
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Firebase 認証情報（機密情報を含むため必ずgit管理外にする）
+serviceAccountKey.json
+scraper/serviceAccountKey.json
+scraper/*.json
+
+# Vercel
+.vercel
+
+# Claude Code 内部ファイル
+.claude/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
