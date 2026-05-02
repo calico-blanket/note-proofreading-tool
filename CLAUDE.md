@@ -1,170 +1,153 @@
 # CLAUDE.md
 
-このファイルは Claude Code (claude.ai/code) がこのリポジトリで作業する際のガイダンスを提供します。
+このファイルは Claude Code がこのリポジトリで作業する際のガイダンスを提供します。
 
-## 🎌 言語とコミュニケーション設定
+---
 
-**最優先：日本語での開発**
-- すべてのコメントは日本語で記述する
-- 変数名・関数名は英語でも、説明コメントは必ず日本語
-- ドキュメントやREADMEは日本語優先
-- エラーメッセージも可能な限り日本語化
+## プロジェクト概要
 
-## 📝 バイブスコーディング スタイルガイド
+**note 校正支援ツール** — team_mirai_log の note.com 過去記事から表記パターンを全文検索し、校正メモを管理する Next.js 製 Web アプリ。
 
-### コード記述の基本原則
-1. **詳細な説明コメント必須**
-   - すべての関数に「何をするか」「なぜそうするか」を日本語で説明
-   - 複雑なロジックには段落ごとに説明コメント
-   - TODOやFIXMEも日本語で記述
+- フロントエンド: Next.js 15 / React 19 / TypeScript / Tailwind CSS
+- バックエンド: Next.js API Routes + Firebase Admin SDK (Firestore)
+- スクレイパー: Python 3.11+ (requests + BeautifulSoup4)
+- CI/CD: GitHub Actions（毎日 JST 6:00 に自動記事取得）
 
-2. **ステップバイステップ実装**
-   - 処理を細かく分割し、各ステップに番号付けコメント
-   - 例：`// ステップ1: ユーザー入力の検証`
-   - 複雑な処理は複数の関数に分割
+---
 
-3. **可読性重視のコード構造**
-   ```javascript
-   // ❌ 悪い例
-   const f=(x,y)=>x>y?x:y;
+## 言語設定
 
-   // ✅ 良い例
-   /**
-    * 二つの数値のうち大きい方を返す関数
-    * @param {number} firstNumber - 比較する最初の数値
-    * @param {number} secondNumber - 比較する二番目の数値
-    * @returns {number} より大きい方の数値
-    */
-   function getMaximumNumber(firstNumber, secondNumber) {
-       // 数値の大小を比較して大きい方を返す
-       if (firstNumber > secondNumber) {
-           return firstNumber;
-       } else {
-           return secondNumber;
-       }
-   }
-   ```
+- コメントは**日本語**で記述する
+- 変数名・関数名は英語、説明コメントは日本語
+- エラーメッセージも日本語
 
-4. **徹底的なエラーハンドリング**
-   - すべての外部入力に対してバリデーション実装
-   - try-catch文で予期しないエラーをキャッチ
-   - エラーメッセージは日本語で分かりやすく
-   - ログ出力機能を積極的に活用
+---
 
-### 命名規則
-- **変数名**: キャメルケース + 意味が分かる名前
-  - `userData` (良い) vs `data` (悪い)
-  - `isUserLoggedIn` (良い) vs `flag` (悪い)
-- **関数名**: 動詞から始まる具体的な名前
-  - `calculateTotalPrice()` (良い) vs `calc()` (悪い)
-  - `validateUserEmail()` (良い) vs `check()` (悪い)
-- **定数名**: UPPER_SNAKE_CASE
-  - `MAX_RETRY_COUNT = 3`
-  - `API_BASE_URL = 'https://example.com'`
+## ディレクトリ構成
 
-## 🚀 プロジェクト構成
-
-### ゲーム開発プロジェクト
-- **goldfish_game.html**: 完全統合型の金魚すくいゲーム（HTML5 Canvas + JavaScript）
-- **kingyo-sukui/**: モジュール分離型の金魚すくいゲーム（HTML/CSS/JS分離）
-
-### プラットフォーム連携
-- **dify/**: オープンソースLLMアプリ開発プラットフォーム
-- **package.json**: React Router、Google Maps APIを使用するNode.jsプロジェクト
-
-## 💻 開発環境とコマンド
-
-### Difyプラットフォーム起動手順
-```bash
-# ステップ1: Difyのdockerディレクトリに移動
-cd dify/docker
-
-# ステップ2: 環境設定ファイルをコピー（初回のみ）
-cp .env.example .env
-
-# ステップ3: Dockerサービスを起動
-docker compose up -d
-
-# ステップ4: ブラウザでダッシュボードにアクセス
-# URL: http://localhost/install
+```
+├── .github/workflows/update_articles.yml  # GitHub Actions
+├── scraper/
+│   ├── fetch_articles.py                  # note.com スクレイパー
+│   └── requirements.txt
+├── src/
+│   ├── app/
+│   │   ├── page.tsx                       # 検索ページ（"use client"）
+│   │   ├── notes/page.tsx                 # 校正メモ一覧（"use client"）
+│   │   └── api/
+│   │       ├── search/route.ts            # GET /api/search?q=
+│   │       ├── notes/route.ts             # GET/POST /api/notes
+│   │       └── notes/import/route.ts      # POST /api/notes/import
+│   ├── components/
+│   │   ├── SearchBox.tsx                  # 非制御input（useRef）
+│   │   ├── ResultCard.tsx
+│   │   ├── HighlightText.tsx
+│   │   └── AddNoteForm.tsx
+│   ├── lib/
+│   │   ├── firestore-admin.ts             # Firebase Admin 初期化
+│   │   └── search.ts                      # 全文検索ロジック
+│   └── types/
+│       ├── search.ts                      # クライアント安全な型
+│       └── notes.ts
+└── .env.local.example
 ```
 
-### Node.js開発環境セットアップ
+---
+
+## Firestore 構成
+
+### `articles` コレクション
+スクレイパーが保存する記事データ。
+
+| フィールド | 型 | 内容 |
+|---|---|---|
+| `title` | string | 記事タイトル |
+| `note_url` | string | 記事の URL |
+| `published_at` | **string** | ISO 8601 形式（Timestamp ではない） |
+| `body` | string | 本文全文 |
+| `paragraphs` | string[] | 段落分割済みテキスト |
+| `fetched_at` | string | 取得日時 |
+
+**注意:** `published_at` は Timestamp 型ではなく文字列型。検索ロジックで型チェックが必要。
+
+### `proofreading_notes` コレクション
+校正メモ。
+
+| フィールド | 型 | 内容 |
+|---|---|---|
+| `original` | string | 原文（例: 係る） |
+| `converted` | string | 変換後（例: かかる） |
+| `note` | string | 備考 |
+| `reference_title` | string | 参考記事タイトル |
+| `reference_url` | string | 参考記事 URL |
+| `created_at` | Timestamp | `FieldValue.serverTimestamp()` で設定 |
+
+---
+
+## 環境変数
+
+### `.env.local`（Next.js サーバーサイド）
+```env
+FIREBASE_SERVICE_ACCOUNT_KEY=<serviceAccountKey.json を Base64 エンコードした値>
+```
+
+### `scraper/.env`
+```env
+FIREBASE_SERVICE_ACCOUNT_KEY_PATH=./serviceAccountKey.json
+NOTE_CREATOR_ID=team_mirai_log
+REQUEST_INTERVAL_SECONDS=1.5
+```
+
+### GitHub Actions Secrets
+- `FIREBASE_SERVICE_ACCOUNT_KEY`: Base64 エンコード済みサービスアカウントJSON
+
+---
+
+## 開発コマンド
+
 ```bash
-# ステップ1: 依存関係をインストール
-npm install
-
-# ステップ2: テスト実行（現在設定されていない場合は設定が必要）
-npm test
-
-# ステップ3: 開発サーバー起動（package.jsonにスクリプトがある場合）
+# ローカル開発サーバー起動
 npm run dev
+
+# 型チェック + ビルド
+npm run build
+
+# スクレイパー実行（scraper/ ディレクトリ内で）
+cd scraper && python fetch_articles.py
 ```
 
-## 🔧 開発ワークフロー
+---
 
-### 新機能実装時の手順
-1. **要件分析**: 何を作るか、なぜ必要かを明確化
-2. **設計フェーズ**: 処理の流れを日本語でコメントとして記述
-3. **実装フェーズ**: 設計したコメントに沿ってコードを記述
-4. **テストフェーズ**: エラーケースを含む動作確認
-5. **ドキュメント更新**: 実装内容を日本語で記録
+## 重要な実装上の注意
 
-### エラー対処の基本パターン
-```javascript
-/**
- * API呼び出し処理の実装例
- * エラーハンドリングと詳細ログを含む
- */
-async function callApiWithErrorHandling(apiUrl, requestData) {
-    try {
-        // ステップ1: 入力データの検証
-        if (!apiUrl || typeof apiUrl !== 'string') {
-            throw new Error('APIのURLが正しく指定されていません');
-        }
-        
-        // ステップ2: API呼び出し実行
-        console.log('API呼び出し開始:', apiUrl);
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestData)
-        });
-        
-        // ステップ3: レスポンス検証
-        if (!response.ok) {
-            throw new Error(`APIエラー: ${response.status} - ${response.statusText}`);
-        }
-        
-        // ステップ4: 成功時の処理
-        const result = await response.json();
-        console.log('API呼び出し成功:', result);
-        return result;
-        
-    } catch (error) {
-        // エラー発生時の詳細ログ出力
-        console.error('API呼び出しでエラーが発生しました:', error.message);
-        console.error('エラー詳細:', error);
-        
-        // エラーを再スローして上位で処理できるようにする
-        throw error;
-    }
+### SearchBox コンポーネント（非制御）
+`onChange` + `useState` ではなく `useRef` で DOM 値を直接参照する設計。
+`inputRef.current?.value` から値を取得すること。
+
+### IME 対応の Enter キー処理
+```typescript
+if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+  handleSearch();
 }
 ```
+`event.isComposing` は React の合成イベント型に存在しないため `event.nativeEvent.isComposing` を使う。
 
-## 🎯 開発環境固有の注意事項
+### firebase-admin のクライアントバンドル防止
+`firebase-admin` をインポートするファイルをクライアントコンポーネントから参照しないこと。
+型定義は `src/types/` に分離して共有する。
 
-- **WSL2環境**: Windowsファイルシステムとの連携に注意
-- **パス区切り文字**: Linuxスタイル（/）を使用
-- **Adobe Creative Suite**: デザイン資産との連携が頻繁
-- **Google Drive**: クラウド同期との競合状態に注意
+### git の push 方法
+ローカル `main` ブランチのワーキングツリーが `C:\Users\sesam` に設定されているため、
+マージせず直接リモートへ push する：
+```bash
+git push origin <branch>:refs/heads/main
+```
 
-## 📚 コード品質チェックリスト
+---
 
-新しいコードを書く前に以下を確認：
-- [ ] 日本語コメントが十分にあるか
-- [ ] 変数名・関数名が意味を表しているか  
-- [ ] エラーハンドリングが実装されているか
-- [ ] ログ出力が適切に配置されているか
-- [ ] ステップバイステップで理解しやすいか
-- [ ] 他の開発者が読んで理解できるか
+## note.com API
+
+- **記事一覧:** `GET https://note.com/api/v2/creators/{creator_id}/contents?kind=note&page={page}`
+- **記事本文:** `/api/v2/notes/{id}` は認証なしで 404 → HTML 直接スクレイピングで対応
+  - `<article>` タグを BeautifulSoup で抽出
+  - Firestore の document ID には数値 `id` ではなく文字列 `key`（例: `n2e4af2e7d18c`）を使用
