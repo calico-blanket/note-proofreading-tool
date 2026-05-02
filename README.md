@@ -247,6 +247,11 @@ GitHub Actions による毎日の自動記事取得を有効にするために�
 
 `.github/workflows/update_articles.yml` により、毎日 JST 6:00（UTC 21:00）に自動でスクレイパーが実行されます。
 
+
+- 新規記事のみ差分取得して Firestore に保存
+- `workflow_dispatch` による手動実行にも対応
+- 実行ログは GitHub の「Actions」タブで確認できます
+  
 ---
 
 # ライセンス
@@ -254,7 +259,3 @@ GitHub Actions による毎日の自動記事取得を有効にするために�
 基本はPrivateリポジトリを想定していますが、公開時はMITライセンスとします。
 （作者：猫柄毛布）
 
-
-- 新規記事のみ差分取得して Firestore に保存
-- `workflow_dispatch` による手動実行にも対応
-- 実行ログは GitHub の「Actions」タブで確認できます
