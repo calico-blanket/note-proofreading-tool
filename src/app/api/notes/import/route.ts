@@ -88,22 +88,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       try {
         const columns = parseCsvRow(line);
 
-        // 列順：原文,変換後,備考,参考記事タイトル,参考記事URL,作成日時
-        const original = columns[0]?.trim() ?? "";
-        const converted = columns[1]?.trim() ?? "";
+        // 列順：note表記,原稿表記,備考,参考記事タイトル,参考記事URL,作成日時
+        const note_expression = columns[0]?.trim() ?? "";
+        const draft_expression = columns[1]?.trim() ?? "";
         const note = columns[2]?.trim() ?? "";
         const referenceTitle = columns[3]?.trim() ?? "";
         const referenceUrl = columns[4]?.trim() ?? "";
 
-        // 原文と変換後が両方空の場合はスキップ
-        if (!original && !converted) {
+        // note表記と原稿表記が両方空の場合はスキップ
+        if (!note_expression && !draft_expression) {
           errorCount++;
           continue;
         }
 
         await db.collection(COLLECTION_NAME).add({
-          original,
-          converted,
+          note_expression,
+          draft_expression,
           note,
           reference_title: referenceTitle,
           reference_url: referenceUrl,

@@ -35,8 +35,8 @@ export async function GET(): Promise<NextResponse> {
       const data = doc.data();
       return {
         id: doc.id,
-        original: data.original ?? "",
-        converted: data.converted ?? "",
+        note_expression: data.note_expression ?? "",
+        draft_expression: data.draft_expression ?? "",
         note: data.note ?? "",
         reference_title: data.reference_title ?? "",
         reference_url: data.reference_url ?? "",
@@ -68,9 +68,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const body: SaveNoteRequest = await request.json();
 
     // ステップ2: 必須フィールドのバリデーション
-    if (!body.original || !body.converted) {
+    if (!body.note_expression || !body.draft_expression) {
       return NextResponse.json(
-        { error: "「原文」と「変換後」は必須項目です。" },
+        { error: "「note表記」と「原稿表記」は必須項目です。" },
         { status: 400 }
       );
     }
@@ -78,8 +78,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // ステップ3: Firestoreクライアントを取得して保存
     const db = getAdminDb();
     const docRef = await db.collection(COLLECTION_NAME).add({
-      original: body.original.trim(),
-      converted: body.converted.trim(),
+      note_expression: body.note_expression.trim(),
+      draft_expression: body.draft_expression.trim(),
       note: body.note?.trim() ?? "",
       reference_title: body.reference_title?.trim() ?? "",
       reference_url: body.reference_url?.trim() ?? "",
