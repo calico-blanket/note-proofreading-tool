@@ -72,13 +72,13 @@ export default function NotesPage() {
    */
   function handleExport() {
     // ヘッダー行
-    const headerRow = "原文,変換後,備考,参考記事タイトル,参考記事URL,作成日時";
+    const headerRow = "note表記,原稿表記,備考,参考記事タイトル,参考記事URL,作成日時";
 
     // データ行（フィールドにカンマや改行がある場合はダブルクォートで囲む）
     const dataRows = notes.map((note) => {
       const fields = [
-        note.original,
-        note.converted,
+        note.note_expression,
+        note.draft_expression,
         note.note,
         note.reference_title,
         note.reference_url,
@@ -254,8 +254,8 @@ export default function NotesPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">原文</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">変換後</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">note表記</th>
+                    <th className="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">原稿表記</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-600">備考</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">参考記事</th>
                     <th className="text-left px-4 py-3 font-medium text-gray-600 whitespace-nowrap">日付</th>
@@ -264,14 +264,14 @@ export default function NotesPage() {
                 <tbody className="divide-y divide-gray-100">
                   {notes.map((note) => (
                     <tr key={note.id} className="hover:bg-gray-50 transition-colors">
-                      {/* 原文 */}
+                      {/* note表記 */}
                       <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">
-                        {note.original}
+                        {note.note_expression}
                       </td>
 
-                      {/* 変換後 */}
+                      {/* 原稿表記 */}
                       <td className="px-4 py-3 text-[#3bbaa8] font-medium whitespace-nowrap">
-                        {note.converted}
+                        {note.draft_expression}
                       </td>
 
                       {/* 備考 */}

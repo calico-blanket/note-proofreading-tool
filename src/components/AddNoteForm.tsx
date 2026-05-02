@@ -36,8 +36,8 @@ export default function AddNoteForm({
   defaultReferenceUrl,
 }: AddNoteFormProps) {
   // フォームの各フィールドのステート
-  const [original, setOriginal] = useState(defaultOriginal);
-  const [converted, setConverted] = useState("");
+  const [note_expression, setNoteExpression] = useState(defaultOriginal);
+  const [draft_expression, setDraftExpression] = useState("");
   const [note, setNote] = useState("");
   const [referenceTitle, setReferenceTitle] = useState(defaultReferenceTitle);
   const [referenceUrl, setReferenceUrl] = useState(defaultReferenceUrl);
@@ -56,8 +56,8 @@ export default function AddNoteForm({
 
     try {
       const requestBody: SaveNoteRequest = {
-        original: original.trim(),
-        converted: converted.trim(),
+        note_expression: note_expression.trim(),
+        draft_expression: draft_expression.trim(),
         note: note.trim(),
         reference_title: referenceTitle.trim(),
         reference_url: referenceUrl.trim(),
@@ -116,30 +116,30 @@ export default function AddNoteForm({
 
         {/* フォーム本体 */}
         <form onSubmit={handleSubmit} className="px-5 py-4 space-y-4">
-          {/* 原文 */}
+          {/* note表記 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              原文 <span className="text-red-500">*</span>
+              note表記 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              value={original}
-              onChange={(e) => setOriginal(e.target.value)}
+              value={note_expression}
+              onChange={(e) => setNoteExpression(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#64D8C6]"
               placeholder="例：係る"
             />
           </div>
 
-          {/* 変換後 */}
+          {/* 原稿表記 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              変換後 <span className="text-red-500">*</span>
+              原稿表記 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              value={converted}
-              onChange={(e) => setConverted(e.target.value)}
+              value={draft_expression}
+              onChange={(e) => setDraftExpression(e.target.value)}
               required
               autoFocus
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#64D8C6]"
@@ -206,7 +206,7 @@ export default function AddNoteForm({
             </button>
             <button
               type="submit"
-              disabled={isSaving || !original.trim() || !converted.trim()}
+              disabled={isSaving || !note_expression.trim() || !draft_expression.trim()}
               className="flex-1 px-4 py-2 rounded-lg text-sm text-white font-medium bg-[#64D8C6] hover:bg-[#4ec9b7] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
               {isSaving ? "保存中..." : "保存"}
