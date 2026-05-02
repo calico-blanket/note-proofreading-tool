@@ -2,9 +2,9 @@ name: Update Articles from note.com
 
 on:
   schedule:
-    # JST 6:00 = UTC 21:00（前日）
+    # JST 06:00 = UTC 21:00 (previous day)
     - cron: '0 21 * * *'
-  workflow_dispatch:  # 手動実行も可能にする
+  workflow_dispatch: {}
 
 jobs:
   fetch:
